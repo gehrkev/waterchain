@@ -1,0 +1,26 @@
+{
+  "name": "water-measurement-chaincode",
+  "version": "1.0.0",
+  "description": "WaterChain Measurement Smart Contract",
+  "main": "index.js",
+  "engines": {
+    "node": ">=12",
+    "npm": ">=5"
+  },
+  "scripts": {
+    "start": "fabric-chaincode-node start",
+    "test": "nyc mocha --recursive",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "fabric-contract-api": "^2.5.2",
+    "fabric-shim": "^2.5.2"
+  },
+  "devDependencies": {
+    "chai": "^4.3.7",
+    "eslint": "^8.42.0",
+    "mocha": "^10.2.0",
+    "nyc": "^15.1.0",
+    "sinon": "^15.1.0"
+  }
+}
