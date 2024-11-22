@@ -1,0 +1,43 @@
+FROM node:16-alpine
+
+WORKDIR /app
+
+# Criar usuário node explicitamente para permissões
+RUN deluser --remove-home node \
+    && addgroup -S node -g 1000 \
+    && adduser -S node -G node -u 1000
+
+# Instalar dependências do sistema necessárias
+RUN apk add --no-cache python3 make g++ git openssl
+
+# Instalar ferramentas de desenvolvimento globais
+RUN npm install -g nodemon typescript ts-node
+
+# Definir ownership dos diretórios
+RUN mkdir -p /app/frontend/node_modules/.cache && \
+    chown -R node:node /app
+
+USER node
+
+# Copiar package.json e .env.example de ambos os projetos
+COPY --chown=node:node backend/package*.json backend/.env.example ./backend/
+COPY --chown=node:node frontend/package*.json frontend/.env.example ./frontend/
+
+# Instalar dependências
+WORKDIR /app/backend
+RUN npm install
+
+WORKDIR /app/frontend
+RUN npm install
+
+# Copiar código fonte
+COPY --chown=node:node backend /app/backend
+COPY --chown=node:node frontend /app/frontend
+
+WORKDIR /app
+
+# Script para iniciar ambos os serviços em desenvolvimento
+COPY --chown=node:node scripts/dev-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/dev-entrypoint.sh
+
+CMD ["dev-entrypoint.sh"]
