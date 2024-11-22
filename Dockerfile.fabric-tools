@@ -1,0 +1,26 @@
+FROM alpine:3.18
+
+# Instalar dependências básicas
+RUN apk add --no-cache \
+    bash \
+    curl \
+    docker \
+    docker-cli-compose \
+    git \
+    jq \
+    tzdata
+
+# Criar diretório de trabalho
+WORKDIR /fabric
+
+# Baixar e instalar os binários do Fabric
+RUN curl -sSL https://raw.githubusercontent.com/hyperledger/fabric/main/scripts/bootstrap.sh | bash -s -- 2.5.0 1.5.5 \
+    && cp /fabric/fabric-samples/bin/cryptogen /usr/local/bin/ \
+    && cp /fabric/fabric-samples/bin/configtxgen /usr/local/bin/ \
+    && rm -rf /fabric/fabric-samples
+
+# Adicionar e tornar executável o script de entrada
+COPY scripts/fabric-tools-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/fabric-tools-entrypoint.sh
+
+ENTRYPOINT ["/bin/bash", "/usr/local/bin/fabric-tools-entrypoint.sh"]
